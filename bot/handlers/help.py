@@ -14,7 +14,7 @@ HELP_TEXT = (
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(HELP_TEXT)
+    await update.message.reply_text(HELP_TEXT, parse_mode='Markdown')
 
 
 def get_help_handler() -> CommandHandler:

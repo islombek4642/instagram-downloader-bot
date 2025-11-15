@@ -2,7 +2,7 @@ import sqlite3
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import Iterator, Optional
+from typing import Dict, Iterator, Optional
 
 
 DB_PATH = Path(__file__).resolve().parents[1] / "bot.db"
@@ -35,6 +35,9 @@ def init_db() -> None:
                 instagram_url TEXT NOT NULL,
                 status TEXT NOT NULL,
                 error_message TEXT,
+                media_count INTEGER DEFAULT 0,
+                media_types TEXT,
+                file_sizes_mb TEXT,
                 created_at TEXT NOT NULL
             )
             """
@@ -79,16 +82,77 @@ def upsert_user(
         conn.commit()
 
 
-def log_download(chat_id: int, instagram_url: str, status: str, error_message: Optional[str] = None) -> None:
+def log_download(
+    chat_id: int,
+    instagram_url: str,
+    status: str,
+    error_message: Optional[str] = None,
+    media_count: int = 0,
+    media_types: Optional[str] = None,
+    file_sizes_mb: Optional[str] = None,
+) -> None:
     now = datetime.utcnow().isoformat()
 
     with get_connection() as conn:
         cur = conn.cursor()
         cur.execute(
             """
-            INSERT INTO downloads (chat_id, instagram_url, status, error_message, created_at)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO downloads (
+                chat_id, instagram_url, status, error_message, 
+                media_count, media_types, file_sizes_mb, created_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (chat_id, instagram_url, status, error_message, now),
+            (chat_id, instagram_url, status, error_message, media_count, media_types, file_sizes_mb, now),
         )
         conn.commit()
+
+
+def get_detailed_stats() -> Dict[str, any]:
+    """Batafsil statistika olish."""
+    with get_connection() as conn:
+        cur = conn.cursor()
+        
+        # Asosiy statistika
+        cur.execute("SELECT COUNT(*) FROM users")
+        users_count = cur.fetchone()[0]
+        
+        cur.execute("SELECT COUNT(*) FROM downloads")
+        downloads_count = cur.fetchone()[0]
+        
+        cur.execute("SELECT COUNT(*) FROM downloads WHERE status = 'success'")
+        success_count = cur.fetchone()[0]
+        
+        # Media turlari statistikasi
+        cur.execute(
+            """
+            SELECT media_types, COUNT(*) as count 
+            FROM downloads 
+            WHERE status = 'success' AND media_types IS NOT NULL
+            GROUP BY media_types
+            ORDER BY count DESC
+            LIMIT 10
+            """
+        )
+        media_types_stats = cur.fetchall()
+        
+        # Oxirgi 7 kundagi faollik
+        cur.execute(
+            """
+            SELECT DATE(created_at) as day, COUNT(*) as count
+            FROM downloads
+            WHERE created_at >= datetime('now', '-7 days')
+            GROUP BY DATE(created_at)
+            ORDER BY day DESC
+            """
+        )
+        daily_activity = cur.fetchall()
+        
+        return {
+            "users_count": users_count,
+            "downloads_count": downloads_count,
+            "success_count": success_count,
+            "success_rate": round((success_count / downloads_count * 100) if downloads_count > 0 else 0, 1),
+            "media_types_stats": media_types_stats,
+            "daily_activity": daily_activity,
+        }

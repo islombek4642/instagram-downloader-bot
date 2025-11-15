@@ -35,7 +35,11 @@ def get_settings() -> Settings:
     if admin_chat_id_raw:
         try:
             admin_chat_id = int(admin_chat_id_raw)
-        except ValueError:
+            # Telegram chat ID lar odatda manfiy yoki musbat katta raqamlar
+            if admin_chat_id == 0 or abs(admin_chat_id) < 100:
+                raise ValueError("Invalid chat ID range")
+        except (ValueError, TypeError) as exc:
+            print(f"Warning: Invalid ADMIN_CHAT_ID format '{admin_chat_id_raw}': {exc}")
             admin_chat_id = None
 
     return Settings(

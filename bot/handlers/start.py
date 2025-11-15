@@ -30,7 +30,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "ℹ️ Qo'shimcha ma'lumot uchun /help buyrug'ini yuboring."
     )
 
-    await update.message.reply_text(text)
+    await update.message.reply_text(text, reply_markup=get_main_menu_keyboard())
 
 
 def get_start_handler() -> CommandHandler:

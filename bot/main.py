@@ -10,6 +10,8 @@ from .handlers.download import get_download_handler
 from .handlers.help import get_help_handler
 from .handlers.stats import get_stats_handler
 from .handlers.contact import get_contact_handler
+from .handlers.health import get_health_handler
+from .services.instagram_downloader import close_http_client
 
 
 async def main() -> None:
@@ -32,6 +34,7 @@ async def main() -> None:
     application.add_handler(get_help_handler())
     application.add_handler(get_contact_handler())
     application.add_handler(get_stats_handler())
+    application.add_handler(get_health_handler())
     application.add_handler(get_download_handler())
 
     await application.initialize()
@@ -44,6 +47,8 @@ async def main() -> None:
         await application.updater.stop()
         await application.stop()
         await application.shutdown()
+        # HTTP client ni yopish
+        await close_http_client()
 
 
 if __name__ == "__main__":
