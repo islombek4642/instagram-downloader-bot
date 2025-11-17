@@ -11,7 +11,7 @@ from .handlers.help import get_help_handler
 from .handlers.stats import get_stats_handler
 from .handlers.contact import get_contact_handler
 from .handlers.health import get_health_handler
-from .services.instagram_downloader import close_http_client
+from .services.social_media_downloader import close_http_client
 
 
 async def main() -> None:

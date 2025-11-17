@@ -11,6 +11,7 @@ class Settings:
     rapidapi_host: str
     rapidapi_url: str
     admin_chat_id: int | None = None
+    max_send_mb: int = 50
 
 
 def get_settings() -> Settings:
@@ -21,6 +22,7 @@ def get_settings() -> Settings:
     rapidapi_host = os.getenv("RAPIDAPI_HOST")
     rapidapi_url = os.getenv("RAPIDAPI_URL")
     admin_chat_id_raw = os.getenv("ADMIN_CHAT_ID")
+    max_send_mb_raw = os.getenv("MAX_SEND_MB", "50")
 
     if not bot_token:
         raise RuntimeError("TELEGRAM_BOT_TOKEN is not set in environment")
@@ -42,10 +44,19 @@ def get_settings() -> Settings:
             print(f"Warning: Invalid ADMIN_CHAT_ID format '{admin_chat_id_raw}': {exc}")
             admin_chat_id = None
 
+    # Max send size (MB)
+    try:
+        max_send_mb = int(str(max_send_mb_raw).strip())
+        if max_send_mb <= 0:
+            max_send_mb = 50
+    except Exception:
+        max_send_mb = 50
+
     return Settings(
         bot_token=bot_token,
         rapidapi_key=rapidapi_key,
         rapidapi_host=rapidapi_host,
         rapidapi_url=rapidapi_url,
         admin_chat_id=admin_chat_id,
+        max_send_mb=max_send_mb,
     )

@@ -3,13 +3,13 @@ from telegram.ext import CommandHandler, ContextTypes
 
 
 HELP_TEXT = (
-    "ℹ️ *Instagram Downloader bot yo'riqnomasi*\n\n"
-    "Men Instagram'dan video va rasmlarni yuklab beradigan botman.\n\n"
+    "ℹ️ *Social Media Downloader yo'riqnomasi*\n\n"
+    "Men Instagram, YouTube, TikTok va boshqa ijtimoiy tarmoqlardan media yuklab beraman.\n\n"
     "✅ *Qanday ishlaydi?*\n"
     "1️⃣ /start buyrug'ini yuboring.\n"
-    "2️⃣ Instagram'dagi post/reels/story linkini yuboring.\n"
+    "2️⃣ Ijtimoiy tarmoqdagi post/reels/video linkini yuboring.\n"
     "3️⃣ Men media fayl(lar)ni sizga qaytaraman.\n\n"
-    "📌 *Eslatma:* faqat ochiq (public) profillardan olingan postlar bilan yaxshiroq ishlaydi."
+    "📌 *Cheklov:* Telegram botlari odatda ~50MB gacha fayllarni qabul qiladi. Katta fayllar uchun to'g'ridan-to'g'ri yuklab olish linkini yuboraman."
 )
 
 

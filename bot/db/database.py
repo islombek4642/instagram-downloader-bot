@@ -32,7 +32,7 @@ def init_db() -> None:
             CREATE TABLE IF NOT EXISTS downloads (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 chat_id INTEGER NOT NULL,
-                instagram_url TEXT NOT NULL,
+                media_url TEXT NOT NULL,
                 status TEXT NOT NULL,
                 error_message TEXT,
                 media_count INTEGER DEFAULT 0,
@@ -42,6 +42,38 @@ def init_db() -> None:
             )
             """
         )
+
+        # Migration: rename column instagram_url -> media_url if needed
+        cur.execute("PRAGMA table_info(downloads)")
+        cols = [row[1] for row in cur.fetchall()]
+        if "instagram_url" in cols and "media_url" not in cols:
+            try:
+                cur.execute("ALTER TABLE downloads RENAME COLUMN instagram_url TO media_url")
+            except sqlite3.OperationalError:
+                cur.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS downloads_new (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        chat_id INTEGER NOT NULL,
+                        media_url TEXT NOT NULL,
+                        status TEXT NOT NULL,
+                        error_message TEXT,
+                        media_count INTEGER DEFAULT 0,
+                        media_types TEXT,
+                        file_sizes_mb TEXT,
+                        created_at TEXT NOT NULL
+                    )
+                    """
+                )
+                cur.execute(
+                    """
+                    INSERT INTO downloads_new (id, chat_id, media_url, status, error_message, media_count, media_types, file_sizes_mb, created_at)
+                    SELECT id, chat_id, instagram_url, status, error_message, media_count, media_types, file_sizes_mb, created_at
+                    FROM downloads
+                    """
+                )
+                cur.execute("DROP TABLE downloads")
+                cur.execute("ALTER TABLE downloads_new RENAME TO downloads")
 
         conn.commit()
 
@@ -84,7 +116,7 @@ def upsert_user(
 
 def log_download(
     chat_id: int,
-    instagram_url: str,
+    media_url: str,
     status: str,
     error_message: Optional[str] = None,
     media_count: int = 0,
@@ -98,12 +130,12 @@ def log_download(
         cur.execute(
             """
             INSERT INTO downloads (
-                chat_id, instagram_url, status, error_message, 
+                chat_id, media_url, status, error_message, 
                 media_count, media_types, file_sizes_mb, created_at
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (chat_id, instagram_url, status, error_message, media_count, media_types, file_sizes_mb, now),
+            (chat_id, media_url, status, error_message, media_count, media_types, file_sizes_mb, now),
         )
         conn.commit()
 

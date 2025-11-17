@@ -15,5 +15,5 @@ def get_main_menu_keyboard() -> ReplyKeyboardMarkup:
         keyboard,
         resize_keyboard=True,
         one_time_keyboard=False,
-        input_field_placeholder="Instagram link yuboring..."
+        input_field_placeholder="Ijtimoiy tarmoq linkini yuboring..."
     )

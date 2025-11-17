@@ -21,13 +21,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     text = (
         "👋 Assalomu alaykum!\n\n"
-        "Men Instagram'dan video va rasmlarni yuklab beradigan botman.\n\n"
+        "Men ijtimoiy tarmoqlardan (Instagram, YouTube, TikTok va boshqalar) media yuklab beradigan botman.\n\n"
         "📝 Foydalanish:\n"
-        "1️⃣ Instagram post yoki reels linkini yuboring.\n"
+        "1️⃣ Ijtimoiy tarmoqdagi post/reels/video linkini yuboring.\n"
         "2️⃣ Men media fayl(lar)ni sizga qaytaraman.\n\n"
-        "Misol link:\n"
-        "https://www.instagram.com/p/XXXXXXXXXXX/\n\n"
-        "ℹ️ Qo'shimcha ma'lumot uchun /help buyrug'ini yuboring."
+        "Misollar:\n"
+        "• https://www.instagram.com/p/XXXXXXXXXXX/\n"
+        "• https://youtu.be/XXXXXXXXXXX\n\n"
+        "ℹ️ Eslatma: Telegram botlari odatda ~50MB gacha fayllarni qabul qiladi. Katta fayllar uchun bevosita yuklab olish linkini yuboraman.\n"
+        "Qo'shimcha ma'lumot uchun /help buyrug'ini yuboring."
     )
 
     await update.message.reply_text(text, reply_markup=get_main_menu_keyboard())
